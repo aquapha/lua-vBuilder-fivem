@@ -133,4 +133,4 @@ print(json.encode(requiredError)) -- { code = "required", message = "Name is req
 
 ## Contribution
 
-Issues and PR's are accepted and encouraged, this was only a small module that I created to safely mutate data in the database without breaking changes and if more custom functionality is needed, please create a PR for it.
+Issues and PR's are accepted and encouraged, this was only a small module that I created to safely mutate data in the database without breaking changes and if more custom functionality is needed, please create a PR for it. I will personally also occasionally update this module with more features and improvements.
