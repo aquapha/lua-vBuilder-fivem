@@ -6,9 +6,9 @@
 
 - Arrays: `vBuilder:array(ChainBuilder[])`
 - Objects: `vBuilder:object(table<string, ChainBuilder>)`
-- Strings: `vBuilder:string()`
-- Numbers: `vBuilder:number()`
-- Enums: `vBuilder:enum(string[])`
+- Strings: `vBuilder:string(CustomOptions | nil)`
+- Numbers: `vBuilder:number(CustomOptions | nil)`
+- Enums: `vBuilder:enum(string[], CustomOptions | nil)`
 
 ## Naming
 
@@ -24,12 +24,12 @@
 
 ## Additional validation methods
 
-- `min(number, CustomOptions)`
+- `min(number, CustomOptions | nil)`
   - `number` Indicates the lowest amount of the value for it to be valid:
     - Number - Size
     - String - Length of string
     - Array - Length of elements
-- `max(number, CustomOptions)`
+- `max(number, CustomOptions | nil)`
   - `number` - Indicates the highest amount of the value for it to be valid:
     - Number - Size
     - String - Length of string
@@ -110,6 +110,23 @@ local passthroughParsed = playerValidation.passthrough().parse({
 	job = "Police",
 })
 print(json.encode(passthroughParsed)) -- { name = "John", job = "Police" }
+```
+
+### Custom error options
+
+```lua
+local playerValidation = vBuilder:object({
+  name = vBuilder:string({
+    requiredErrorMessage = "Name is required",
+    invalidTypeMessage = "Name must be a string",
+  }),
+})
+
+local _, typeError = playerValidation.parse({ name = 123 })
+print(json.encode(typeError)) -- { code = "invalid_type", message = "Name must be a string", path = "" }
+
+local _, requiredError = playerValidation.parse({})
+print(json.encode(requiredError)) -- { code = "required", message = "Name is required", path = ""}
 ```
 
 ## Contribution
