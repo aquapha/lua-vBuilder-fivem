@@ -1,3 +1,5 @@
+<img src="https://i.imgur.com/LnCTOgG.png" width="200" height="200" style="display: block; margin: 0 auto; margin-bottom: 20px;" />
+
 # vBuilder - Data validation builder
 
 `vBuilder` ( validationBuilder ) is a tool that is focused on building validation schemas to ensure that the data received matches a specific specification.
