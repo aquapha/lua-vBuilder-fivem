@@ -1,4 +1,4 @@
-<img src="https://i.imgur.com/LnCTOgG.png" width="200" height="200" style="display: block; margin: 0 auto; margin-bottom: 20px;" />
+<img src="https://i.imgur.com/VW17b7j.png" style="display: block; margin: 0 auto; margin-bottom: 40px;" />
 
 # vBuilder - Data validation builder
 
