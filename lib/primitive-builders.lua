@@ -9,6 +9,7 @@ function vBuilder:string(options)
   builder.metadata = {}
   builder.metadata.type = "string"
   builder.metadata.required = true
+  builder.metadata.additional = {}
   builder.metadata.passUndefined = false
   builder.metadata.options = options or {}
 
@@ -31,6 +32,7 @@ function vBuilder:number(options)
   builder.metadata = {}
   builder.metadata.type = "number"
   builder.metadata.required = true
+  builder.metadata.additional = {}
   builder.metadata.passUndefined = false
   builder.metadata.options = options or {}
 
@@ -126,6 +128,7 @@ function vBuilder:array(element, options)
 
   builder.metadata = {}
   builder.metadata.type = "array"
+  builder.metadata.additional = {}
   builder.metadata.required = true
   builder.metadata.element = element
   builder.metadata.passUndefined = false
