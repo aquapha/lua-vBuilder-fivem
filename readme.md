@@ -54,8 +54,8 @@ local playerValidation <const> = vBuilder:object({
 	ssn = vBuilder:string()
 })
 
-local validPlayer = { ssn = "123456789" }
-local invalidPlayer = { ssn = nil } -- Or {}
+local validPlayer <const> = { ssn = "123456789" }
+local invalidPlayer <const> = { ssn = nil } -- Or {}
 
 local validParsed, validError = playerValidation.parse(validPlayer)
 local invalidParsed, invalidError = playerValidation.parse(invalidPlayer)
@@ -64,7 +64,7 @@ local invalidParsed, invalidError = playerValidation.parse(invalidPlayer)
 print(json.encode(validParsed)) -- { ssn = "123456789 }
 print(json.encode(validError)) -- nil
 
--- ❌ Passes the validation
+-- ❌ Fails the validation
 print(json.encode(invalidParsed)) -- nil
 print(json.encode(invalidError)) -- { code = "required", message = "Value is required", }
 ```
@@ -72,16 +72,16 @@ print(json.encode(invalidError)) -- { code = "required", message = "Value is req
 ### Methods `.min, .max, .optional`
 
 ```lua
-local playerNameValidation = vBuilder:string().min(1).max(10)
+local playerNameValidation <const> = vBuilder:string().min(1).max(10)
 
 -- ✅ Passes the validation since it is more than 1 characted and less than 10
 local valid = playerNameValidation.parse("John")
 -- ❌ Fails the validation since it is more than 10
-local invalidLong = playerNameValidation.parse("John The Mighty")
+local _, longError = playerNameValidation.parse("John The Mighty")
 -- ❌ Fails the validation since it is less than 1
-local invalidShort = playerNameValidation.parse("")
+local _, shortError = playerNameValidation.parse("")
 -- ❌ Fails the validation since it is nil
-local invalidNil = playerNameValidation.parse(nil)
+local _, nilError = playerNameValidation.parse(nil)
 
 -- If you wish to allow nil values, you can simply append the `.optional()` method
 -- Or do if from the start of the validation builder
@@ -95,7 +95,7 @@ local validNewNil = playerNilNameValidation.parse(nil)
 ### Method `.passthrough`
 
 ```lua
-local playerValidation = vBuilder:object({
+local playerValidation <const> = vBuilder:object({
 	name = vBuilder:string().min(1).max(10),
 })
 
@@ -117,7 +117,7 @@ print(json.encode(passthroughParsed)) -- { name = "John", job = "Police" }
 ### Custom error options
 
 ```lua
-local playerValidation = vBuilder:object({
+local playerValidation <const> = vBuilder:object({
   name = vBuilder:string({
     requiredErrorMessage = "Name is required",
     invalidTypeMessage = "Name must be a string",
