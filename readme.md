@@ -1,6 +1,6 @@
 # vBuilder - Data validation builder
 
-`vBuilder` ( validation Builder ) is a tool that is focused on building validation schemas to ensure that the data received matches a specific specification.
+`vBuilder` ( validationBuilder ) is a tool that is focused on building validation schemas to ensure that the data received matches a specific specification.
 
 ## Supported data types
 
