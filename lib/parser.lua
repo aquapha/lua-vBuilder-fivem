@@ -99,21 +99,6 @@ function validationParse(builder)
       }
     end
 
-    -- Enum parser
-    if (builder.metadata.type == "enum") then
-      for _, enumValue in ipairs(builder.metadata.enums) do
-        if (enumValue == value) then
-          return value, nil
-        end
-      end
-
-      return nil, {
-        path = "",
-        code = ValidationCodes.InvalidEnum,
-        message = builder.metadata.options.invalidTypeMessage or ("Invalid enum. Received: %s, expected: %s"):format(value, table.concat(builder.metadata.enums, ", "))
-      }
-    end
-
     -- String and number parser
     if (
       builder.metadata.type == "string"
@@ -124,14 +109,19 @@ function validationParse(builder)
       return alphanumericParser(builder)(value)
     end
 
-    -- Array parser
-    if (builder.metadata.type == "array") then
-      return arrayParser(builder)(value)
+    -- Enum parser
+    if (builder.metadata.type == "enum") then
+      return enumParser(builder)(value)
     end
 
     -- Object parser
     if (builder.metadata.type == "object") then
       return objectParser(builder)(value)
+    end
+    
+    -- Array parser
+    if (builder.metadata.type == "array") then
+      return arrayParser(builder)(value)
     end
 
     return value, nil

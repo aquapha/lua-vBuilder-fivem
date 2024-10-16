@@ -1,4 +1,4 @@
----@description Parser for the `object` data type.
+---@description Parser for the `array` data type.
 ---@param builder ChainBuilder
 ---@return Parser
 ---@diagnostic disable-next-line: lowercase-global
