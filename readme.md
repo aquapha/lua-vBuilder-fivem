@@ -6,11 +6,12 @@
 
 ## Supported data types
 
-- Arrays: `vBuilder:array(ChainBuilder[])`
-- Objects: `vBuilder:object(table<string, ChainBuilder>)`
+- Arrays: `vBuilder:array(ChainBuilder, CustomOptions | nil)`
+- Objects: `vBuilder:object(table<string, ChainBuilder>, CustomOptions | nil)`
 - Strings: `vBuilder:string(CustomOptions | nil)`
 - Numbers: `vBuilder:number(CustomOptions | nil)`
 - Enums: `vBuilder:enum(string[], CustomOptions | nil)`
+- Unions: `vBuilder:union(ChainBuilder[], CustomOptions | nil)`
 
 ## Naming
 
@@ -22,7 +23,6 @@
   - `path` - The path to the field that failed
   - `message` - The error message
   - `code` An enum code for that specific error
-  -
 
 ## Additional validation methods
 
@@ -57,8 +57,8 @@ local playerValidation <const> = vBuilder:object({
 local validPlayer <const> = { ssn = "123456789" }
 local invalidPlayer <const> = { ssn = nil } -- Or {}
 
-local validParsed, validError = playerValidation.parse(validPlayer)
-local invalidParsed, invalidError = playerValidation.parse(invalidPlayer)
+local validParsed <const>, validError <const> = playerValidation.parse(validPlayer)
+local invalidParsed <const>, invalidError <const> = playerValidation.parse(invalidPlayer)
 
 -- ✅ Passes the validation
 print(json.encode(validParsed)) -- { ssn = "123456789 }
@@ -72,15 +72,37 @@ print(json.encode(invalidError)) -- { code = "required", message = "Value is req
 ### Enum validation
 
 ```lua
-local playerJobEnum = vBuilder:enum({ "Police", "Firefighter", "Doctor" })
+local playerJobEnum <const> = vBuilder:enum({ "Police", "Firefighter", "Doctor" })
 
-local validJob = playerJobEnum.parse("Police")
+local validJob <const> = playerJobEnum.parse("Police")
 print(validJob) -- "Police
 
-local _, invalidJobError = playerJobEnum.parse("Teacher")
+local _, invalidJobError <const> = playerJobEnum.parse("Teacher")
 print(json.encode(invalidJobError)) -- { code = "invalid_enum", message = "Value is not a valid enum", path = "" }
 
 -- It is case sensitive, meaning that "police, POLICE, pOlIcE, ...etc" will fail the validation
+```
+
+### Union validation
+
+#### Caveats
+
+1. Cannot be used within an array: `vBuilder:array(vBuilder:union(...))`. This is due to the fact that the array builder expects a single type and not a union of types.
+
+```lua
+local playerJobNameOrIdUnion <const> = vBuilder:union({
+  vBuilder:string(),
+  vBuilder:number(),
+})
+
+local validString <const> = playerJobNameOrIdUnion.parse("Police")
+print(validString) -- "Police"
+
+local validNumber <const> = playerJobNameOrIdUnion.parse(123)
+print(validNumber) -- 123
+
+local _, invalidError <const> = playerJobNameOrIdUnion.parse({})
+print(json.encode(invalidError)) -- { code = "invalid_union", message = "Invalid union. Received: table, expected: string, number", path = "" }
 ```
 
 ### Methods `.min, .max, .optional`
@@ -100,10 +122,10 @@ local _, nilError = playerNameValidation.parse(nil)
 -- If you wish to allow nil values, you can simply append the `.optional()` method
 -- Or do if from the start of the validation builder
 -- ✅ Passes the validation since nil is allowed
-local validNil = playerNameValidation.optional().parse(nil)
+local validNil <const> = playerNameValidation.optional().parse(nil)
 -- Or
-local playerNilNameValidation = vBuilder:string().min(1).max(10).optional()
-local validNewNil = playerNilNameValidation.parse(nil)
+local playerNilNameValidation <const> = vBuilder:string().min(1).max(10).optional()
+local validNewNil <const> = playerNilNameValidation.parse(nil)
 ```
 
 ### Method `.passthrough`
@@ -114,14 +136,14 @@ local playerValidation <const> = vBuilder:object({
 })
 
 -- Will remove the `job` field since it is not present in the schema
-local nonPassthroughParsed = playerValidation.parse({
+local nonPassthroughParsed <const> = playerValidation.parse({
 	name = "John",
 	job = "Police",
 })
 print(json.encode(nonPassthroughParsed)) -- { name = "John" }
 
 -- Will keep the `job` field since `.passthrough()` is appended.
-local passthroughParsed = playerValidation.passthrough().parse({
+local passthroughParsed <const> = playerValidation.passthrough().parse({
 	name = "John",
 	job = "Police",
 })
@@ -138,13 +160,13 @@ local playerValidation <const> = vBuilder:object({
   }),
 })
 
-local _, typeError = playerValidation.parse({ name = 123 })
+local _, typeError <const> = playerValidation.parse({ name = 123 })
 print(json.encode(typeError)) -- { code = "invalid_type", message = "Name must be a string", path = "" }
 
-local _, requiredError = playerValidation.parse({})
+local _, requiredError <const> = playerValidation.parse({})
 print(json.encode(requiredError)) -- { code = "required", message = "Name is required", path = ""}
 ```
 
 ## Contribution
 
-Issues and PR's are accepted and encouraged, this was only a small module that I created to safely mutate data in the database without breaking changes and if more custom functionality is needed, please create a PR for it. I will personally also occasionally update this module with more features and improvements.
+Issues are encouraged, this was only a small module that I created to safely mutate data in the database without breaking changes and if more custom functionality is needed, please create an issue for it. I will occasionally update this module with more features and improvements.

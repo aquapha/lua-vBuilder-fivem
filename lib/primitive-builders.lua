@@ -89,14 +89,14 @@ end
 ---@param fields table<string, ChainBuilder>
 ---@param options CustomOptions | nil
 function vBuilder:object(fields, options)
+  if (type(fields) ~= "table" or (isArray(fields) and #fields > 0)) then
+    error("Fields must be a table")
+  end
+
   ---@class ObjectChainBuilder: ChainBuilder
   ---@field passthrough fun(): ObjectChainBuilder Allows values that don't exist in the schema to pass through
   ---@field optional fun(): ObjectChainBuilder Accepts a nil value
   local builder = {}
-
-  if (type(fields) ~= "table" or (isArray(fields) and #fields > 0)) then
-    error("Fields must be a table")
-  end
 
   builder.metadata = {}
   builder.metadata.type = "object"
@@ -116,15 +116,20 @@ end
 ---@param element ChainBuilder
 ---@param options CustomOptions | nil
 function vBuilder:array(element, options)
+  if (type(element) ~= "table") then
+    error("Element must be a ChainBuilder")
+  end
+
+  -- Don't allow unions in arrays
+  if (element.metadata.type == "union") then
+    error("Unions are not allowed in arrays")
+  end
+
   ---@class ArrayChainBuilder: ChainBuilder
   ---@field optional fun(): ArrayChainBuilder Accepts a nil value
   ---@field min fun(min: number, errorMessage: ErrorMessage): ArrayChainBuilder Enforces a minimum length for an array
   ---@field max fun(max: number, errorMessage: ErrorMessage): ArrayChainBuilder Enforces a maximum length for an array
   local builder = {}
-
-  if (type(element) ~= "table") then
-    error("Element must be a ChainBuilder")
-  end
 
   builder.metadata = {}
   builder.metadata.type = "array"
@@ -137,6 +142,30 @@ function vBuilder:array(element, options)
   builder.parse = validationParse(builder)
   builder.min = PrimitiveMethods.min(builder)
   builder.max = PrimitiveMethods.max(builder)
+  builder.optional = PrimitiveMethods.optional(builder)
+
+  return builder
+end
+
+---@param builders ChainBuilder[]
+---@param options CustomOptions | nil
+function vBuilder:union(builders, options)
+  if (type(builders) ~= "table" or not isArray(builders)) then
+    error("Builders must be an array")
+  end
+
+  ---@class UnionChainBuilder: ChainBuilder
+  ---@field optional fun(): UnionChainBuilder Accepts a nil value
+  local builder = {}
+
+  builder.metadata = {}
+  builder.metadata.type = "union"
+  builder.metadata.required = true
+  builder.metadata.passUndefined = false
+  builder.metadata.options = options or {}
+  builder.metadata.unionBuilders = builders
+
+  builder.parse = validationParse(builder)
   builder.optional = PrimitiveMethods.optional(builder)
 
   return builder

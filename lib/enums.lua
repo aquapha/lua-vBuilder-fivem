@@ -6,5 +6,6 @@ ValidationCodes = {
   TooSmall = "too_small",
   InvalidType = "invalid_type",
   InvalidEnum = "invalid_enum",
+  InvalidUnion = "invalid_union",
   FailedToParse = "failed_to_parse",
 }
