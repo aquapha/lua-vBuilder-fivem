@@ -149,33 +149,7 @@ function validationParse(builder)
 
     -- Object parser
     if (builder.metadata.type == "object") then
-      if (type(builder.metadata.fields) ~= "table") then
-        return value, nil
-      end
-
-      if (not builder.metadata.passUndefined) then
-        for key in pairs(value) do
-          if (builder.metadata.fields[key] == nil) then
-            value[key] = nil
-          end
-        end
-      end
-
-      for key, fieldBuilder in pairs(builder.metadata.fields) do
-        local parsed, error = fieldBuilder.parse(value[key])
-
-        if (error) then
-          return nil, {
-            code = error.code,
-            message = error.message,
-            path = ("%s%s"):format(key, string.len(error.path) > 0 and (".%s"):format(error.path) or ""),
-          }
-        end
-
-        value[key] = parsed
-      end
-
-      return value, nil
+      return objectParser(builder)(value)
     end
 
     return value, nil
