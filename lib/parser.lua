@@ -5,6 +5,8 @@
 ---@param builder ChainBuilder
 ---@diagnostic disable-next-line: lowercase-global
 function validationParse(builder)
+  validateBuilder(builder)
+
   ---@type Parser
   return function (value)
     if (not builder.metadata.required and value == nil) then
@@ -96,7 +98,19 @@ function validationParse(builder)
     if (builder.metadata.type == "union") then
       return unionParser(builder)(value)
     end
+  
+    error([[
+      
+      Code: failed_to_parse
 
-    return value, nil
+      Message:
+        Failed to parse the provided value. This is likely due to an issue
+        within the parser.
+
+        Please open an issue at `https://github.com/aquapha/lua-vBuilder-fivem/issues/new`
+        with the validation chain that caused this error and the error code.
+    ]])
+
+    return nil, nil
   end
 end
