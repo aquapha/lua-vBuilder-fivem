@@ -5,6 +5,8 @@
 ---@param builder ChainBuilder
 ---@diagnostic disable-next-line: lowercase-global
 function validationParse(builder)
+  validateBuilder(builder)
+
   ---@type Parser
   return function (value)
     if (not builder.metadata.required and value == nil) then
@@ -67,53 +69,6 @@ function validationParse(builder)
       end
     end
 
-    -- Union parser
-    if (builder.metadata.type == "union") then
-      ---@type ValidationError[]
-      local unionErrors = {}
-      ---@type PrimitiveType[]
-      local acceptedUnionTypes = {}
-
-      for _, unionBuilder in ipairs(builder.metadata.unionBuilders) do
-        local parsed, unionError = unionBuilder.parse(value)
-
-        if (parsed) then
-          return parsed, nil
-        end
-
-        table.insert(unionErrors, unionError)
-        table.insert(acceptedUnionTypes, unionBuilder.metadata.type)
-      end
-
-      -- If all errors are type errors, it means that the value is not a valid union
-      for _, unionError in ipairs(unionErrors) do
-        if (unionError.code ~= ValidationCodes.InvalidType) then
-          return nil, unionError
-        end
-      end
-
-      return nil, {
-        path = "",
-        code = ValidationCodes.InvalidUnion,
-        message = builder.metadata.options.invalidTypeMessage or ("Invalid union. Received: %s, expected: %s"):format(valueType, table.concat(acceptedUnionTypes, ", "))
-      }
-    end
-
-    -- Enum parser
-    if (builder.metadata.type == "enum") then
-      for _, enumValue in ipairs(builder.metadata.enums) do
-        if (enumValue == value) then
-          return value, nil
-        end
-      end
-
-      return nil, {
-        path = "",
-        code = ValidationCodes.InvalidEnum,
-        message = builder.metadata.options.invalidTypeMessage or ("Invalid enum. Received: %s, expected: %s"):format(value, table.concat(builder.metadata.enums, ", "))
-      }
-    end
-
     -- String and number parser
     if (
       builder.metadata.type == "string"
@@ -121,69 +76,41 @@ function validationParse(builder)
       or builder.metadata.type == "array"
       and (builder.metadata.additional and #builder.metadata.additional > 0)
     ) then
-      for _, additionalParser in ipairs(builder.metadata.additional) do
-        local parsed = additionalParser.validate(value)
-
-        if (type(parsed) == "table") then
-          return nil, parsed
-        end
-      end
+      return alphanumericParser(builder)(value)
     end
 
-    -- Array parser
-    if (builder.metadata.type == "array") then
-      if (builder.metadata.element == nil) then
-        error("Element builder is not defined")
-      end
-
-      for index, field in ipairs(value) do
-        local parsed, error = builder.metadata.element.parse(field)
-
-        if (error) then
-          return nil, {
-            code = error.code,
-            message = error.message,
-            path = ("%s%s"):format(index, string.len(error.path) > 0 and (".%s"):format(error.path) or ""),
-          }
-        end
-
-        value[index] = parsed
-      end
-
-      return value, nil
+    -- Enum parser
+    if (builder.metadata.type == "enum") then
+      return enumParser(builder)(value)
     end
 
     -- Object parser
     if (builder.metadata.type == "object") then
-      if (type(builder.metadata.fields) ~= "table") then
-        return value, nil
-      end
-
-      if (not builder.metadata.passUndefined) then
-        for key in pairs(value) do
-          if (builder.metadata.fields[key] == nil) then
-            value[key] = nil
-          end
-        end
-      end
-
-      for key, fieldBuilder in pairs(builder.metadata.fields) do
-        local parsed, error = fieldBuilder.parse(value[key])
-
-        if (error) then
-          return nil, {
-            code = error.code,
-            message = error.message,
-            path = ("%s%s"):format(key, string.len(error.path) > 0 and (".%s"):format(error.path) or ""),
-          }
-        end
-
-        value[key] = parsed
-      end
-
-      return value, nil
+      return objectParser(builder)(value)
+    end
+    
+    -- Array parser
+    if (builder.metadata.type == "array") then
+      return arrayParser(builder)(value)
     end
 
-    return value, nil
+    -- Union parser
+    if (builder.metadata.type == "union") then
+      return unionParser(builder)(value)
+    end
+  
+    error([[
+      
+      Code: failed_to_parse
+
+      Message:
+        Failed to parse the provided value. This is likely due to an issue
+        within the parser.
+
+        Please open an issue at `https://github.com/aquapha/lua-vBuilder-fivem/issues/new`
+        with the validation chain that caused this error and the error code.
+    ]])
+
+    return nil, nil
   end
 end

@@ -7,5 +7,15 @@ ValidationCodes = {
   InvalidType = "invalid_type",
   InvalidEnum = "invalid_enum",
   InvalidUnion = "invalid_union",
-  FailedToParse = "failed_to_parse",
+}
+
+---@enum AllowedPrimitiveBuilderType
+AllowedPrimitiveBuilderTypes = {
+  enum = "enum",
+  array = "array",
+  union = "union",
+  string = "string",
+  number = "number",
+  object = "object",
+  boolean = "boolean",
 }
