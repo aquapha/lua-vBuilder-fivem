@@ -69,6 +69,20 @@ print(json.encode(invalidParsed)) -- nil
 print(json.encode(invalidError)) -- { code = "required", message = "Value is required", }
 ```
 
+### Enum validation
+
+```lua
+local playerJobEnum = vBuilder:enum({ "Police", "Firefighter", "Doctor" })
+
+local validJob = playerJobEnum.parse("Police")
+print(validJob) -- "Police
+
+local _, invalidJobError = playerJobEnum.parse("Teacher")
+print(json.encode(invalidJobError)) -- { code = "invalid_enum", message = "Value is not a valid enum", path = "" }
+
+-- It is case sensitive, meaning that "police, POLICE, pOlIcE, ...etc" will fail the validation
+```
+
 ### Methods `.min, .max, .optional`
 
 ```lua
