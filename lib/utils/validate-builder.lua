@@ -31,7 +31,7 @@ function validateBuilder(builder)
     if (builder.metadata.type == allowedPrimitiveBuilderType) then
       return
     end
-
-    throwInvalidBuilderError("invalid_builder_primitive_type")
   end
+
+  throwInvalidBuilderError("invalid_builder_primitive_type")
 end
