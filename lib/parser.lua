@@ -126,25 +126,7 @@ function validationParse(builder)
 
     -- Array parser
     if (builder.metadata.type == "array") then
-      if (builder.metadata.element == nil) then
-        error("Element builder is not defined")
-      end
-
-      for index, field in ipairs(value) do
-        local parsed, error = builder.metadata.element.parse(field)
-
-        if (error) then
-          return nil, {
-            code = error.code,
-            message = error.message,
-            path = ("%s%s"):format(index, string.len(error.path) > 0 and (".%s"):format(error.path) or ""),
-          }
-        end
-
-        value[index] = parsed
-      end
-
-      return value, nil
+      return arrayParser(builder)(value)
     end
 
     -- Object parser
