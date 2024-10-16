@@ -34,7 +34,7 @@ function validationParse(builder)
       correctedType = builder.metadata.type
     end
 
-    if (correctedType ~= builder.metadata.type) then
+    if (builder.metadata.type ~= "union" and correctedType ~= builder.metadata.type) then
       return nil, {
         path = "",
         code = ValidationCodes.InvalidType,
@@ -65,6 +65,38 @@ function validationParse(builder)
           message = builder.metadata.options.invalidTypeMessage or ("Invalid type. Received: %s, expected: object"):format(valueType == "table" and "array" or valueType)
         }
       end
+    end
+
+    -- Union parser
+    if (builder.metadata.type == "union") then
+      ---@type ValidationError[]
+      local unionErrors = {}
+      ---@type PrimitiveType[]
+      local acceptedUnionTypes = {}
+
+      for _, unionBuilder in ipairs(builder.metadata.unionBuilders) do
+        local parsed, unionError = unionBuilder.parse(value)
+
+        if (parsed) then
+          return parsed, nil
+        end
+
+        table.insert(unionErrors, unionError)
+        table.insert(acceptedUnionTypes, unionBuilder.metadata.type)
+      end
+
+      -- If all errors are type errors, it means that the value is not a valid union
+      for _, unionError in ipairs(unionErrors) do
+        if (unionError.code ~= ValidationCodes.InvalidType) then
+          return nil, unionError
+        end
+      end
+
+      return nil, {
+        path = "",
+        code = ValidationCodes.InvalidUnion,
+        message = builder.metadata.options.invalidTypeMessage or ("Invalid union. Received: %s, expected: %s"):format(valueType, table.concat(acceptedUnionTypes, ", "))
+      }
     end
 
     -- Enum parser

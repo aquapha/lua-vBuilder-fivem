@@ -1,7 +1,7 @@
 -- Root class for the validation builder
 
 ---@alias ErrorMessage string | nil
----@alias PrimitiveType "string" | "number" | "object" | "array" | "boolean" | "enum"
+---@alias PrimitiveType "string" | "number" | "object" | "array" | "boolean" | "enum" | "union"
 ---@alias ValidationMethod fun(value: any): boolean | ValidationError The function to validate the value, if string is returned, the validation failed
 
 ---@class CustomOptions The custom options for the validation
@@ -17,6 +17,7 @@
 ---@field additional Validation[] | nil The additional validations to be used
 ---@field element ChainBuilder | nil The element of the array
 ---@field enums string[] | nil The enums for the validation
+---@field unionBuilders ChainBuilder[] | nil The builders for the union
 
 ---@class Validation
 ---@field validate ValidationMethod
