@@ -12,6 +12,7 @@ shared_scripts {
 
   'lib/enums.lua',
   'lib/generator.lua',
+  'lib/parsers/*.lua',
   'lib/parser.lua',
 
   'lib/methods/primitive-methods.lua',

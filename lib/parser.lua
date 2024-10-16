@@ -121,13 +121,7 @@ function validationParse(builder)
       or builder.metadata.type == "array"
       and (builder.metadata.additional and #builder.metadata.additional > 0)
     ) then
-      for _, additionalParser in ipairs(builder.metadata.additional) do
-        local parsed = additionalParser.validate(value)
-
-        if (type(parsed) == "table") then
-          return nil, parsed
-        end
-      end
+      return alphanumericParser(builder)(value)
     end
 
     -- Array parser
