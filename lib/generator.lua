@@ -36,8 +36,6 @@
 vBuilder = {}
 
 -- Register an export if the script is running on the client
-if (not IsDuplicityVersion()) then
-  exports("vBuilder", function()
-    return vBuilder
-  end)
-end
+exports("vBuilder", function()
+  return vBuilder
+end)

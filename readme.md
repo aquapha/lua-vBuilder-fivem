@@ -4,6 +4,15 @@
 
 `vBuilder` ( validationBuilder ) is a tool that is focused on building validation schemas to ensure that the data received matches a specific specification.
 
+## Setup
+
+This resource is used as an exported module, so you can simply import it into your resource and use it.
+
+```lua
+-- Same is for both client and server
+vBuilder = exports["lua-vBuilder-fivem"]:vBuilder()
+```
+
 ## Supported data types
 
 - Arrays: `vBuilder:array(ChainBuilder, CustomOptions | nil)`
