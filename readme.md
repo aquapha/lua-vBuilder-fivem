@@ -6,11 +6,12 @@
 
 ## Setup
 
-This resource is used as an exported module, so you can simply import it into your resource and use it.
+This resource exposes an initialization file, to use it, simply add the following to your `fxmanifest.lua` file:
 
 ```lua
--- Same is for both client and server
-vBuilder = exports["lua-vBuilder-fivem"]:vBuilder()
+shared_scripts {
+  '@lua-vBuilder-fivem/init.lua',
+}
 ```
 
 ## Supported data types
