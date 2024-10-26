@@ -19,4 +19,6 @@ shared_scripts {
   'lib/methods/table-methods.lua',
 
   'lib/primitive-builders.lua',
+
+  'init.lua'
 }
