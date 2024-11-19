@@ -22,7 +22,7 @@ function validationParse(builder)
     end
 
     local correctedType = type(value) --[[@as PrimitiveType]]--
-    
+
     -- Convert table to object or array
     if (
       (builder.metadata.type == "object" or builder.metadata.type == "array")
@@ -77,6 +77,11 @@ function validationParse(builder)
       and (builder.metadata.additional and #builder.metadata.additional > 0)
     ) then
       return alphanumericParser(builder)(value)
+    end
+
+    -- Boolean parser
+    if (builder.metadata.type == "boolean") then
+      return booleanParser(builder)(value)
     end
 
     -- Enum parser

@@ -25,6 +25,7 @@ local moduleRoutes = {
   "lib/enums.lua",
   "lib/generator.lua",
   "lib/parsers/alphanumeric-parser.lua",
+  "lib/parsers/boolean-parser.lua",
   "lib/parsers/array-parser.lua",
   "lib/parsers/enum-parser.lua",
   "lib/parsers/object-parser.lua",
